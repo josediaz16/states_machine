@@ -1,1 +1,4 @@
 gems
+*.swo
+*.swp
+.byebug_history
