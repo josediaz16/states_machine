@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    image: nat/states_machine
+    volumes:
+      - .:/states_machine
+    ports:
+      - 3000:3000
+    tty: true
+    stdin_open: true

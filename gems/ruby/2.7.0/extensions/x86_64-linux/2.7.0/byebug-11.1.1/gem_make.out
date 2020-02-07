@@ -1,0 +1,19 @@
+current directory: /states_machine/gems/ruby/2.7.0/gems/byebug-11.1.1/ext/byebug
+/usr/local/bin/ruby -I /usr/local/lib/ruby/2.7.0 -r ./siteconf20200207-10-t2lld7.rb extconf.rb
+creating Makefile
+
+current directory: /states_machine/gems/ruby/2.7.0/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR=" clean
+
+current directory: /states_machine/gems/ruby/2.7.0/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR="
+compiling breakpoint.c
+compiling byebug.c
+compiling context.c
+compiling locker.c
+compiling threads.c
+linking shared-object byebug/byebug.so
+
+current directory: /states_machine/gems/ruby/2.7.0/gems/byebug-11.1.1/ext/byebug
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 byebug.so ./.gem.20200207-10-i06rpq/byebug
