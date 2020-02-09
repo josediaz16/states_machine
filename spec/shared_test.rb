@@ -1,8 +1,7 @@
-require './open'
 require 'active_support/time'
 
-RSpec.describe Open do
-  let(:response) { subject.(input) }
+RSpec.shared_examples "Monad state machine" do
+  let(:response) { subject.(**input) }
   let(:input) {
     {
       desired_state: :open,
@@ -37,7 +36,8 @@ RSpec.describe Open do
           showed_state: :closed
         })
 
-        expect(response).to eq(expected_response)
+        expect(response).to be_success
+        expect(response.success).to eq(expected_response)
       end
     end
 
@@ -62,7 +62,8 @@ RSpec.describe Open do
             showed_state: :not_detected
           })
 
-          expect(response).to match(expected_response)
+          expect(response).to be_success
+          expect(response.success).to eq(expected_response)
         end
       end
 
@@ -86,7 +87,8 @@ RSpec.describe Open do
             desired_state: :do_nothing
           })
 
-          expect(response).to match(expected_response)
+          expect(response).to be_success
+          expect(response.success).to eq(expected_response)
         end
       end
     end
@@ -104,7 +106,8 @@ RSpec.describe Open do
 
         expected_response[:downlink][:sequence] = 11
 
-        expect(response).to match(expected_response)
+        expect(response).to be_success
+        expect(response.success).to eq(expected_response)
       end
     end
 
@@ -119,7 +122,8 @@ RSpec.describe Open do
           showed_state: :open
         })
 
-        expect(response).to match(expected_response)
+        expect(response).to be_success
+        expect(response.success).to eq(expected_response)
       end
     end
   end
