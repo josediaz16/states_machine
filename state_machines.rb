@@ -1,7 +1,22 @@
 require 'dry/monads'
+require_relative 'db'
 
 module StateMachines
   extend Dry::Monads[:result]
+
+  FetchDevice = -> input do
+    device = DeviceRepository[input[:id]]
+    if device.empty?
+      Failure(:device_not_found)
+    else
+      Success(input)
+    end
+  end
+
+  UpdateStates = -> input do
+    valid_fields = input.slice(:desired_state, :machine_state, :showed_state)
+    DeviceRepository.update(input[:id], **valid_fields)
+  end
 
   ValveStateMachine = -> input, new_state do
     input[:machine_state] = new_state

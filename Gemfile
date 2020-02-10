@@ -11,6 +11,10 @@ gem 'dry-validation'
 gem 'dry-transaction'
 gem 'dry-monads'
 
+gem 'rom'
+gem 'rom-sql'
+gem 'sqlite3'
+
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end
