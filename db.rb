@@ -52,7 +52,7 @@ module Repositories
     # (and therefore our persistence API in general) is a perfect reflection
     # of our app's persistence requirements.
     def [](id)
-      devices.by_id(id).one!
+      devices.by_id(id).one
     end
 
   end

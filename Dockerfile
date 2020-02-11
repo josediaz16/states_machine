@@ -9,4 +9,7 @@ RUN mkdir /states_machine
 
 WORKDIR /states_machine
 
+COPY Gemfile* ./
+RUN bundle install
+
 ENTRYPOINT ["./docker_entrypoint"]

@@ -1,21 +1,24 @@
 require 'dry/monads'
 require_relative 'db'
+require 'byebug'
 
 module StateMachines
-  extend Dry::Monads[:result]
+  extend Dry::Monads[:result, :maybe]
 
   FetchDevice = -> input do
     device = DeviceRepository[input[:id]]
-    if device.empty?
-      Failure(:device_not_found)
-    else
-      Success(input)
-    end
+    Maybe(device)
+      .fmap { input }
+      .to_result(:device_not_found)
   end
 
   UpdateStates = -> input do
     valid_fields = input.slice(:desired_state, :machine_state, :showed_state)
-    DeviceRepository.update(input[:id], **valid_fields)
+    updated = DeviceRepository.update(input[:id], **valid_fields)
+
+    Maybe(updated)
+      .fmap { input }
+      .to_result(:update_failed)
   end
 
   ValveStateMachine = -> input, new_state do

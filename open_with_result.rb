@@ -1,4 +1,5 @@
 require_relative 'state_machines'
+require 'byebug'
 
 class OpenWithResult
 
@@ -6,96 +7,101 @@ class OpenWithResult
     last_valve_state = input[:last_uplink][:valve_state]
 
     if last_valve_state.eql?(:closed)
-      #input[:machine_state] = :closed
-      #input[:showed_state] = :closed
+      fetch_device_response = StateMachines::FetchDevice.(input)
 
-      valve_position_response = StateMachines::ValveStateMachine.(input, :closed)
-
-      response = if valve_position_response.success?
-        StateMachines::ShowedStateMachine.(input, :closed)
+      response = if fetch_device_response.success?
+        update_states_response = StateMachines::UpdateStates.(id: input[:id], machine_state: "closed", showed_state: "closed")
+        if update_states_response.success?
+          Dry::Monads::Success.new(input)
+        else
+          update_states_response
+        end
       else
-        valve_position_response
+        fetch_device_response
       end
+
       return response
     end
 
     if last_valve_state.eql?(:not_detected) && input[:pos_nd] < 3
-      #input[:machine_state] = :not_detected
-      #input[:showed_state] = :not_detected
-      #input[:pos_nd] += 1
+      fetch_device_response = StateMachines::FetchDevice.(input)
 
-      valve_position_response = StateMachines::ValveStateMachine.(input, :not_detected)
+      response = if fetch_device_response.success?
 
-      response = if valve_position_response.success?
-        showed_state_response = StateMachines::ShowedStateMachine.(input, :not_detected)
+        update_states_response = StateMachines::UpdateStates.(id: input[:id], machine_state: "not_detected", showed_state: "not_detected")
 
-        if showed_state_response.success?
+        if update_states_response.success?
           StateMachines::IncreaseCounter.(input, :pos_nd)
         else
-          showed_state_response
+          update_states_response
         end
+
       else
-        valve_position_response
+        fetch_device_response
       end
 
       return response
     end
 
     if last_valve_state.eql?(:not_detected) && input[:pos_nd] >= 3
-      #input[:machine_state] = :not_detected
-      #input[:desired_state] = :do_nothing
-      #input[:showed_state] = :not_detected
-      #input[:pos_nd] = 0
+      fetch_device_response = StateMachines::FetchDevice.(input)
 
-      valve_position_response = StateMachines::ValveStateMachine.(input, :not_detected)
+      response = if fetch_device_response.success?
 
-      response = if valve_position_response.success?
-        showed_state_response = StateMachines::ShowedStateMachine.(input, :not_detected)
+        update_states_response = StateMachines::UpdateStates.(id: input[:id], machine_state: "not_detected", showed_state: "not_detected", desired_state: "do_nothing")
 
-        if showed_state_response.success?
-          update_couters_reponse = StateMachines::ResetCounter.(input, :pos_nd)
-
-          if update_couters_reponse.success?
-            StateMachines::DesiredStateMachine.(input, :do_nothing)
-          else
-            update_couters_reponse
-          end
+        if update_states_response.success?
+          StateMachines::ResetCounter.(input, :pos_nd)
         else
-          showed_state_response
+          update_states_response
         end
       else
-        valve_position_response
+        fetch_device_response
       end
 
       return response
     end
 
     if input[:desired_state].eql?(:closed)
-      #input[:downlink][:sequence] += 1
-      #input[:timeout] = 7
-      #input[:machine_state] = :waiting_closed_downlink
+      fetch_device_response = StateMachines::FetchDevice.(input)
 
-      valve_position_response = StateMachines::ValveStateMachine.(input, :waiting_closed_downlink)
+      response = if fetch_device_response.success?
 
-      response = if valve_position_response.success?
-        update_couters_reponse = StateMachines::SetCounter.(input, :timeout, 7)
+        update_states_response = StateMachines::UpdateStates.(id: input[:id], machine_state: "waiting_closed_downlink", desired_state: "closed")
 
-        if update_couters_reponse.success?
-          StateMachines::GenerateDownlink.(input)
+        if update_states_response.success?
+          update_couters_reponse = StateMachines::SetCounter.(input, :timeout, 7)
+
+          if update_couters_reponse.success?
+            StateMachines::GenerateDownlink.(input)
+          else
+            update_couters_reponse
+          end
         else
-          update_couters_reponse
+          update_states_response
         end
       else
-        valve_position_response
+        fetch_device_response
       end
 
       return response
     end
 
     if input[:desired_state].eql?(:open) && last_valve_state.eql?(:open)
-      #input[:showed_state] = :open
+      fetch_device_response = StateMachines::FetchDevice.(input)
 
-      return StateMachines::ShowedStateMachine.(input, :open)
+      response = if fetch_device_response.success?
+        update_states_response = StateMachines::UpdateStates.(id: input[:id], showed_state: "open")
+        if update_states_response.success?
+          Dry::Monads::Success.new(input)
+        else
+          update_states_response
+        end
+      else
+        fetch_device_response
+      end
+
+      return response
     end
 
   end
