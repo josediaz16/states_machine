@@ -40,7 +40,7 @@ module Repositories
   # This simple repository uses devices as its main relation.
   class Devices < ROM::Repository[:devices]
     # Define a command to create new devices.
-    commands :create, update: :by_pk
+    commands :create, update: :by_pk, delete: :by_pk
 
     # Define methods to return the device objects we want to use within our
     # app. Each of these can access the relation via `devices` and use its

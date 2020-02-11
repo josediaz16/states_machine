@@ -1,9 +1,9 @@
 require 'dry/monads'
 require_relative 'db'
-require 'byebug'
+require_relative 'trigger_downlink'
 
 module StateMachines
-  extend Dry::Monads[:result, :maybe]
+  extend Dry::Monads[:result, :maybe, :try]
 
   FetchDevice = -> input do
     device = DeviceRepository[input[:id]]
@@ -58,9 +58,12 @@ module StateMachines
   end
 
   GenerateDownlink = -> input do
-    input[:downlink][:sequence] += 1
-
-    Success input
+    Try(IotClient::DeviceError) do
+      TriggerDownlink
+        .new(IotClient.new("https://amazon.iot/waico/devices"))
+        .call(id: input[:id], sequence: 1)
+    end
+    .to_result
   end
 
 end

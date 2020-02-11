@@ -73,7 +73,13 @@ class OpenWithResult
           update_couters_reponse = StateMachines::SetCounter.(input, :timeout, 7)
 
           if update_couters_reponse.success?
-            StateMachines::GenerateDownlink.(input)
+            generate_downlink_response = StateMachines::GenerateDownlink.(input)
+
+            if generate_downlink_response.success?
+              Dry::Monads::Success.new(input)
+            else
+              generate_downlink_response
+            end
           else
             update_couters_reponse
           end

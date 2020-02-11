@@ -49,6 +49,9 @@ class OpenWithBinds
         .bind do |update_counters_response|
           StateMachines::GenerateDownlink.(input)
         end
+        .bind do |showed_state_response|
+          Success input
+        end
     end
 
     if input[:desired_state].eql?(:open) && last_valve_state.eql?(:open)

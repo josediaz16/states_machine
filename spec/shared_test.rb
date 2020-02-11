@@ -1,5 +1,6 @@
 require 'active_support/time'
 require './db'
+require 'byebug'
 
 RSpec.shared_examples "Monad state machine" do
   let(:response) { subject.(**input) }
@@ -25,6 +26,10 @@ RSpec.shared_examples "Monad state machine" do
   }
 
   describe "#call" do
+    before do
+      DeviceRepository.devices.delete
+    end
+
     context "The device does not exist" do
       it "Should be a failure" do
         expect(response).to be_failure

@@ -1,4 +1,5 @@
-require 'byebug'
+require './db'
+require './trigger_downlink'
 
 class Open
   def call(input)
@@ -23,14 +24,19 @@ class Open
 
       if input[:desired_state].eql?(:closed)
         if update_device(input[:id], machine_state: "waiting_closed_downlink", desired_state: "closed")
-          input[:downlink][:sequence] += 1
-          input[:timeout] = 7
+          begin
+            input[:timeout] = 7
+            trigger_downlink(id: input[:id], sequence: 1)
+          rescue IotClient::DeviceError => error
+            EmailClient.notify_error(subject: "Can't trigger downlink for device #{input[:id]}")
+          end
         end
       end
 
       if input[:desired_state].eql?(:open) && last_valve_state.eql?(:open)
         update_device(input[:id], showed_state: "open")
       end
+
       input
     else
       raise "device_not_found"
@@ -48,5 +54,13 @@ class Open
     rescue ROM::SQL::Error => error
       false
     end
+  end
+
+  def trigger_downlink(input)
+    TriggerDownlink.new(iot_client).call(input)
+  end
+
+  def iot_client
+    @iot_client ||= IotClient.new("https://amazon.iot/waico/devices")
   end
 end
