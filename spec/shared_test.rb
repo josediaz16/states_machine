@@ -50,7 +50,7 @@ RSpec.shared_examples "Monad state machine" do
           }
 
           expect(response).to be_success
-          expect(response.success).to eq(input)
+          expect(response.success).to include(input)
 
           persisted_device = DeviceRepository[device.id]
 
@@ -79,7 +79,7 @@ RSpec.shared_examples "Monad state machine" do
             })
 
             expect(response).to be_success
-            expect(response.success).to eq(expected_response)
+            expect(response.success).to include(expected_response)
 
             persisted_device = DeviceRepository[device.id]
 
@@ -106,7 +106,7 @@ RSpec.shared_examples "Monad state machine" do
             })
 
             expect(response).to be_success
-            expect(response.success).to eq(expected_response)
+            expect(response.success).to include(expected_response)
 
             persisted_device = DeviceRepository[device.id]
 
@@ -129,7 +129,7 @@ RSpec.shared_examples "Monad state machine" do
           expected_response[:downlink][:sequence] = 11
 
           expect(response).to be_success
-          expect(response.success).to eq(expected_response)
+          expect(response.success).to include(expected_response)
 
           persisted_device = DeviceRepository[device.id]
 
@@ -144,7 +144,7 @@ RSpec.shared_examples "Monad state machine" do
           input[:machine_state] = :open
 
           expect(response).to be_success
-          expect(response.success).to eq(input)
+          expect(response.success).to include(input)
 
           persisted_device = DeviceRepository[device.id]
 

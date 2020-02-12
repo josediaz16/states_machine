@@ -6,5 +6,7 @@ services:
       - .:/states_machine
     ports:
       - 3000:3000
+    environment:
+      - RUBYOPT=-W:no-deprecated -W:no-experimental
     tty: true
     stdin_open: true

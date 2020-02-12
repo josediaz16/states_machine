@@ -21,24 +21,6 @@ module StateMachines
       .to_result(:update_failed)
   end
 
-  ValveStateMachine = -> input, new_state do
-    input[:machine_state] = new_state
-
-    Success input
-  end
-
-  ShowedStateMachine = -> input, new_state do
-    input[:showed_state] = new_state
-
-    Success input
-  end
-
-  DesiredStateMachine = -> input, new_state do
-    input[:desired_state] = new_state
-
-    Success input
-  end
-
   IncreaseCounter = -> input, counter do
     input[counter] += 1
 
@@ -58,12 +40,9 @@ module StateMachines
   end
 
   GenerateDownlink = -> input do
-    Try(IotClient::DeviceError) do
       TriggerDownlink
         .new(IotClient.new("https://amazon.iot/waico/devices"))
         .call(id: input[:id], sequence: 1)
-    end
-    .to_result
   end
 
 end

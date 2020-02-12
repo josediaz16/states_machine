@@ -3,6 +3,10 @@ require_relative 'state_machines'
 class OpenWithBinds
   include Dry::Monads[:result]
 
+  NextStates = {
+    last_valve_closed: [machine_state: "closed", showed_state: "closed"]
+  }
+
   def call(**input)
     last_valve_state = input[:last_uplink][:valve_state]
 
